@@ -1,0 +1,5 @@
+#include "Sample.h"
+
+
+GAMECORE(TEST, 1280, 768)
+//GAME_SIMPLE_CORE(TEST)

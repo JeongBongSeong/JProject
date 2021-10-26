@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="JCamera">
+    <Position X="6.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQEEAAAAAgAEAAAgAAIEEAACAAAAAAAAABCCABAACBE=</HashCode>
+      <FileName>JCamera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JDebugCamera">
+    <Position X="6.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>JCamera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JMap">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAA=</HashCode>
+      <FileName>JMap.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JModel">
+    <Position X="2.5" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>IBgGAAAAAAEAEQABgAACAACAAAADiEgAARACAZAGAQE=</HashCode>
+      <FileName>JModel.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JNode">
+    <Position X="11.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QBAAAAgDIAAAQAAAAQgCAIAADAIBAAAAAACCgACAAAA=</HashCode>
+      <FileName>JNode.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JQuadtree">
+    <Position X="13.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>KDCAAAACAAAhMBAAABkIBAAEDAABgAgIQRACARAYAAE=</HashCode>
+      <FileName>JQuadtree.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JShape">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>JShape.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JBoxShape">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>JShape.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Sample">
+    <Position X="17.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAACAAAAAAAIAABIAAAwBEAAAAAAAAAJACABAAAAE=</HashCode>
+      <FileName>Sample.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JCore">
+    <Position X="15.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAACAAAAAAABAUAAAAAAAAAAACEAAABACABAKAAU=</HashCode>
+      <FileName>D:\JBS\JProject\include\JCore.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JDevice">
+    <Position X="15.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CBAABAAMAAgCICAAAAAAAACAAACAAAAKAAAAAAAgIAA=</HashCode>
+      <FileName>D:\JBS\JProject\include\JDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JInput">
+    <Position X="4.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQABBAAgAAAAAAAAAACAAQAAhAACAEACJAKgBAAAAE=</HashCode>
+      <FileName>D:\JBS\JProject\include\JInput.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JSingleton&lt;T&gt;">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>D:\JBS\JProject\include\JStd.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JTimer">
+    <Position X="8" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAIAAACAIAAAAEAAAAQBAAAAQBQCABAAAAE=</HashCode>
+      <FileName>D:\JBS\JProject\include\JTimer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JWindow">
+    <Position X="17.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAMAAAAAACAAAAQQQAAAAAAAAAAAAAAAAIAAQACoAAY=</HashCode>
+      <FileName>D:\JBS\JProject\include\JWindow.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JWrite">
+    <Position X="8" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAACIABAAJAgAAAAABACABAAAIE=</HashCode>
+      <FileName>D:\JBS\JProject\include\JWrite.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="JMapInfo">
+    <Position X="4.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgABIACAAQAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>JMap.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="SimpleVertex">
+    <Position X="6.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAIAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>JModel.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="CB_DATA">
+    <Position X="6.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAABAAAgAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>JModel.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Rect">
+    <Position X="4.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAhgAAAAAAA=</HashCode>
+      <FileName>JNode.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="JRect">
+    <Position X="8" Y="11.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAgAgAAAAAAAAAA=</HashCode>
+      <FileName>JNode.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="JLodPatch">
+    <Position X="8" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAQAAAAAAAAAAABAAAAAAAAAAAAAAAAAgAAQBAAAAA=</HashCode>
+      <FileName>JNode.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>
