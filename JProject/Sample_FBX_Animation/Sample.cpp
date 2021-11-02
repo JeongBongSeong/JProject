@@ -69,47 +69,158 @@ HRESULT Sample::CreateDepthStencilState()
 }
 bool		Sample::Init()
 {
+	TPlane  p;
+	p.x = 0.0f;
+	p.y = 1.0f;
+	p.z = 0.0f;
+	p.w = -0.1f;
+
+	
+	m_vLight.x = 100.0f;
+	m_vLight.y = 100.0f;
+	m_vLight.z = 100.0f;
+	m_vLight.w = 0.0f;
+	D3DXMatrixShadow(&m_matShadow, &m_vLight, &p);
+
+	ID3DBlob* PSBlob = nullptr;
+	PSBlob = JModel::LoadShaderBlob(L"../../data/shader/CharacterShader.hlsl", "PSShadow", "ps_5_0");
+	if(PSBlob != nullptr)
+	{
+		HRESULT hr = S_OK;
+		hr = g_pd3dDevice->CreatePixelShader(
+			PSBlob->GetBufferPointer(),
+			PSBlob->GetBufferSize(),
+			NULL, &m_pPSShadow);
+		if (FAILED(hr)) return hr;
+		PSBlob->Release();
+	}
+
+
+	
+
 	CreateDepthStencilView();
 	CreateDepthStencilState();
 
-
-	//m_FbxObj.LoadObject("../../data/object/ship.fbx");
-	m_FbxObjA.LoadObject("../../data/object/man.fbx");
-	m_FbxObjB.LoadObject("../../data/object/Turret.fbx");
+	//
+	float pos = 350.0f;
+	m_vMovePos.x = pos;
+	
+	m_vMovePos.z = -pos;
+	m_FbxObjA.m_matWorld._41 = pos;
+	
+	m_FbxObjA.m_matWorld._43 = -pos;
+	//
+	CStopwatch stop;
+	//m_FbxObj.LoadObject("../../data/object/ship.fbx","../../data/shader/DefaultShader.hlsl");
+	m_FbxObjA.LoadObject("../../data/object/man.fbx", "../../data/shader/CharacterShader.hlsl");
+	stop.Output(L"a");
+	//m_FbxObjB.LoadObject("../../data/object/Turret.fbx");
 	//m_Texture.LoadTexture(L"../../data/wireframe.dds");
 	//m_FbxObj.LoadObject("../../data/box.fbx");
 	m_Camera.CreateViewMatrix(TVector3(0, 0, -100), TVector3(0, 0, 0));
 	m_Camera.CreateProjMatrix(1.0f, 1000.0f, XM_PI * 0.25f, (float)g_rtClient.right / (float)g_rtClient.bottom);
 
+	JMapInfo info{
+	   64 + 1,
+	   64 + 1, 0,0, 0,
+	   10.0f
+	};
+	if (m_Map.Load(info))
+	{
+		m_Map.Create(L"..\\..\\data\\shader\\Shader.hlsl", "VS", "PS");
+	}
+	m_Quadtree.Build(&m_Map);
 	return true;
 }
 bool		Sample::Frame() 
 {
+	m_Map.Frame();
+	float fSpeed = 1.0f;
 	if (g_Input.GetKey(VK_F4) == KEY_PUSH)
 	{
-		m_FbxObjB.m_bAnimPlay = !m_FbxObjB.m_bAnimPlay;
+		m_FbxObjA.m_bAnimPlay = !m_FbxObjA.m_bAnimPlay;
 	}
-	m_FbxObjB.Frame();
+	if (g_Input.GetKey(VK_UP) >= KEY_PUSH)
+	{
+		m_vMovePos.z += fSpeed;
+		/*m_vMovePos.x += m_FbxObjA.m_matWorld._13 * -0.01f;
+		m_vMovePos.y += m_FbxObjA.m_matWorld._23 * -0.01f;
+		m_vMovePos.z += m_FbxObjA.m_matWorld._33 * -0.01f;*/
+	}
+	if (g_Input.GetKey(VK_DOWN) >= KEY_PUSH)
+	{
+		m_vMovePos.z -= fSpeed;
+	}
+	if (g_Input.GetKey(VK_LEFT) >= KEY_PUSH)
+	{
+		m_vMovePos.x -= fSpeed;
+	}
+	if (g_Input.GetKey(VK_RIGHT) >= KEY_PUSH)
+	{
+		m_vMovePos.x += fSpeed;
+	}
+	if (g_Input.GetKey('Q') >= KEY_PUSH)
+	{
+		m_fNum += fSpeed / 100;
+		D3DXMatrixRotationY(&m_FbxObjA.m_matWorld, m_fNum);
+		
+	}
+	if (g_Input.GetKey('E') >= KEY_PUSH)
+	{
+		m_fNum -= fSpeed / 100;
+		D3DXMatrixRotationY(&m_FbxObjA.m_matWorld, m_fNum);
+		
+	}
+
+	m_FbxObjA.Frame();
 	return true;
 }
 bool		Sample::Render()
 {
+	m_Map.SetMatrix(
+		nullptr,
+		&m_Camera.m_matView,
+		&m_Camera.m_matProj);
+
+	//m_Map.Render(m_pImmediateContext);
+	
+	m_Quadtree.Render(m_pImmediateContext, m_Camera.m_vCameraPos);
 	//m_FbxObj.SetMatrix(nullptr, &m_Camera.m_matView, &m_Camera.m_matProj);
 	//m_FbxObj.Render(m_pImmediateContext);
-	m_FbxObjA.SetMatrix(nullptr, &m_Camera.m_matView, &m_Camera.m_matProj);
+	m_FbxObjA.m_matWorld._41 = m_vMovePos.x;
+	m_FbxObjA.m_matWorld._42 = m_vMovePos.y;
+	m_FbxObjA.m_matWorld._43 = m_vMovePos.z;
+	m_FbxObjA.SetMatrix(&m_FbxObjA.m_matWorld, &m_Camera.m_matView, &m_Camera.m_matProj);
+	m_FbxObjA.SetPixelShader(nullptr);
 	m_FbxObjA.Render(m_pImmediateContext);
-	m_FbxObjB.SetMatrix(nullptr, &m_Camera.m_matView, &m_Camera.m_matProj);
-	m_FbxObjB.Render(m_pImmediateContext);
+
+	m_matShadow._41 = m_vLight.x * m_FbxObjA.m_matWorld._41;
+	m_matShadow._42 = m_vLight.y * m_FbxObjA.m_matWorld._42;
+	m_matShadow._43 = m_vLight.z * m_FbxObjA.m_matWorld._43;
+	
+	m_matShadow._11 = m_vLight.x * m_FbxObjA.m_matWorld._11;
+	m_matShadow._13 = m_vLight.z * m_FbxObjA.m_matWorld._13;
+	m_matShadow._31 = m_vLight.x * m_FbxObjA.m_matWorld._31;
+	m_matShadow._33 = m_vLight.z * m_FbxObjA.m_matWorld._33;
+
+	
+	m_FbxObjA.SetMatrix(&m_matShadow, &m_Camera.m_matView, &m_Camera.m_matProj);
+	m_FbxObjA.SetPixelShader(m_pPSShadow);
+	m_FbxObjA.Render(m_pImmediateContext);
+	//m_FbxObjB.SetMatrix(nullptr, &m_Camera.m_matView, &m_Camera.m_matProj);
+	//m_FbxObjB.Render(m_pImmediateContext);
 	return true;
 }
 bool		Sample::Release()
 {
+	m_Map.Release();
 	SAFE_RELEASE(m_pDsvState);
 	SAFE_RELEASE(m_pDepthStencilView);
 	//m_FbxObj.Release();
 	m_FbxObjA.Release();
 	m_FbxObjB.Release();
 	//m_Texture.Release();
+	SAFE_RELEASE(m_pPSShadow);
 	return true;
 }
 Sample::Sample()

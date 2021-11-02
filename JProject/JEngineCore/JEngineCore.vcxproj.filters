@@ -66,6 +66,15 @@
     <ClCompile Include="JTexture.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="JViewDS.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="JViewRT.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="JDxState.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="JCore.h">
@@ -119,6 +128,15 @@
     <ClInclude Include="JTexture.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="JViewDS.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="JViewRT.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="JDxState.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\data\shader\Shader.hlsl">
@@ -127,12 +145,24 @@
     <FxCompile Include="..\..\data\shader\DefaultShader.hlsl">
       <Filter>data</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\data\shader\CharacterShader.hlsl">
+      <Filter>data</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\data\script\ObjectData.txt">
       <Filter>data</Filter>
     </Text>
     <Text Include="..\..\data\script\StaticLod.txt">
+      <Filter>data</Filter>
+    </Text>
+    <Text Include="..\..\data\shader\ProjectionShadow.txt">
+      <Filter>data</Filter>
+    </Text>
+    <Text Include="..\..\data\shader\PlanePS.txt">
+      <Filter>data</Filter>
+    </Text>
+    <Text Include="..\..\data\shader\PlaneVS.txt">
       <Filter>data</Filter>
     </Text>
   </ItemGroup>

@@ -46,28 +46,31 @@ struct PNCT_VERTEX
 
 struct CB_DATA
 {
-	TMatrix  matWorld;
-	TMatrix  matView;
-	TMatrix  matProj;
-	TVector4 vValue;
+	TMatrix		matWorld;
+	TMatrix		matView;
+	TMatrix		matProj;
+	TMatrix		matNormal;
+	TVector4	vValue;
 };
 
 class JModel
 {
 public:
-	UINT				m_iVertexSize;
-	UINT				m_iNumIndex;
+	JTexture			m_Tex;
+	UINT				m_iVertexSize = 0;
+	UINT				m_iNumIndex = 0;
 	CB_DATA				m_cbData;
 	ID3DBlob* m_pVSBlob = nullptr;
 
-	ID3D11Buffer* m_pVertexBuffer;
-	ID3D11Buffer* m_pIndexBuffer;
-	ID3D11Buffer* m_pConstantBuffer;
+	ID3D11Buffer* m_pVertexBuffer = nullptr;
+	ID3D11Buffer* m_pIndexBuffer = nullptr;
+	ID3D11Buffer* m_pConstantBuffer = nullptr;
 
-	ID3D11InputLayout* m_pVertexLayout;
+	ID3D11InputLayout* m_pVertexLayout = nullptr;
 
-	ID3D11VertexShader* m_pVS;
-	ID3D11PixelShader* m_pPS;
+	ID3D11VertexShader* m_pVS = nullptr;
+	ID3D11PixelShader* m_pMainPS = nullptr;
+	ID3D11PixelShader* m_pPS = nullptr;
 	
 	std::vector< PNCT_VERTEX> m_pVertexList;
 	std::vector< DWORD> m_pIndexList;
@@ -77,26 +80,29 @@ public:
 
 public:
 	void SetMatrix(TMatrix* pMatWorld, TMatrix* pMatView, TMatrix* pMatProj);
+	bool LoadTexture(std::wstring szTextureName);
 	bool LoadObject(std::wstring filename);		//정점의 정보를 파일에서 읽어와 정점리스트에 넣는다.
-
+	virtual HRESULT LoadShader(std::wstring vsstrFilename, std::wstring psstrFilename, std::string vsEntry, std::string psEntry);
 
 public:
-	HRESULT	CreateConstantBuffer();
-	HRESULT CreateVertexBuffer();
-	HRESULT CreateIndexBuffer();
-	HRESULT CreateVertexLayout();
-	HRESULT CreateVertexShader(std::wstring strFilename,std::string vsEntry);
-	HRESULT CreatePixelShader(std::wstring strFilename, std::string psEntry);
-
 	virtual bool CreateVertexData();
 	virtual bool CreateIndexData();
+
+public:
+	virtual HRESULT	CreateConstantBuffer();
+	virtual HRESULT CreateVertexBuffer();
+	virtual HRESULT CreateIndexBuffer();
+	virtual HRESULT CreateVertexLayout();
+
+public:
+	static ID3DBlob* LoadShaderBlob(std::wstring strFilename, std::string sEntry, std::string version);
 
 
 public:
 	bool Init();
-	virtual bool Create(std::wstring filename, std::string vsEntry, std::string psEntry);
 	bool Frame();
-	bool PreRender(ID3D11DeviceContext* pContext);
+	virtual bool Create(std::wstring vsfilename, std::wstring psfilename, std::string vsEntry, std::string psEntry,std::wstring szTextureName = NULL);
+	virtual bool PreRender(ID3D11DeviceContext* pContext);
 	virtual bool Render(ID3D11DeviceContext* pContext);
 	virtual bool PostRender(ID3D11DeviceContext* pContext, UINT iNumIndex);
 	virtual bool Release();

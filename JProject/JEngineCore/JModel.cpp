@@ -14,6 +14,16 @@ void		JModel::SetMatrix(TMatrix* pMatWorld, TMatrix* pMatView, TMatrix* pMatProj
     {
         m_cbData.matProj = pMatProj->Transpose();
     }
+    m_cbData.matNormal = m_cbData.matNormal.Transpose();
+}
+
+bool JModel::LoadTexture(std::wstring szTextureName)
+{
+    if (!szTextureName.empty())
+    {
+        return m_Tex.LoadTexture(szTextureName);
+    }
+    return false;
 }
 
 bool  JModel::LoadObject(std::wstring filename)
@@ -125,54 +135,47 @@ HRESULT JModel::CreateVertexLayout()
     m_pVSBlob->Release();
     return hr;
 }
-HRESULT JModel::CreateVertexShader(std::wstring strFilename, std::string vsEntry)
+HRESULT JModel::LoadShader(std::wstring vsstrFilename, std::wstring psstrFilename, std::string vsEntry, std::string psEntry)
 {
     HRESULT hr = S_OK;
-    ID3DBlob* error = nullptr;
-    hr = D3DCompileFromFile(
-        strFilename.c_str(),
-        nullptr,
-        nullptr,
-        vsEntry.c_str(),
-        "vs_5_0",
-        0,
-        0,
-        &m_pVSBlob,
-        nullptr);
-    if (FAILED(hr)) { return hr; }
 
+    m_pVSBlob = LoadShaderBlob(vsstrFilename, vsEntry, "vs_5_0");
     hr = g_pd3dDevice->CreateVertexShader(
         m_pVSBlob->GetBufferPointer(),
         m_pVSBlob->GetBufferSize(),
         NULL, &m_pVS);
     if (FAILED(hr)) return hr;
-    return hr;
-}
-HRESULT JModel::CreatePixelShader(std::wstring strFilename, std::string psEntry)
-{
-    HRESULT hr = S_OK;
-    ID3DBlob* PSBlob = nullptr;
-    hr = D3DCompileFromFile(
-        strFilename.c_str(),
-        nullptr,
-        nullptr,
-        psEntry.c_str(),
-        "ps_5_0",
-        0,
-        0,
-        &PSBlob,
-        nullptr);
-    if (FAILED(hr)){return hr;}
+    
 
+    ID3DBlob* PSBlob = nullptr;
+    PSBlob = LoadShaderBlob(psstrFilename, psEntry, "ps_5_0");
     hr = g_pd3dDevice->CreatePixelShader(
         PSBlob->GetBufferPointer(),
         PSBlob->GetBufferSize(),
         NULL, &m_pPS);
+    m_pMainPS = m_pPS;
     if (FAILED(hr)) return hr;
     PSBlob->Release();
     return hr;
 }
+ID3DBlob* JModel::LoadShaderBlob(std::wstring strFilename, std::string sEntry, std::string version)
+{
+    HRESULT hr = S_OK;
+    ID3DBlob* retBlob = nullptr;
+    hr = D3DCompileFromFile(
+        strFilename.c_str(),
+        nullptr,
+        nullptr,
+        sEntry.c_str(),
+        version.c_str(),
+        0,
+        0,
+        &retBlob,
+        nullptr);
+    if (FAILED(hr)) { return retBlob; }
 
+    return retBlob;
+}
 
 
 
@@ -203,26 +206,24 @@ bool JModel::Init()
     return true;
 }
 
-bool JModel::Create(std::wstring filename,std::string vsEntry, std::string psEntry)
+bool JModel::Create(std::wstring vsfilename, std::wstring psfilename, std::string vsEntry, std::string psEntry, std::wstring szTextureName)
 {
     //LoadObject(L"..\\..\\data\\script\\ObjectData.txt");
-    CreateConstantBuffer();
+    
     if (CreateVertexData())
     {
         CreateVertexBuffer();
-    }
+        if (CreateIndexData())
+        {
+            CreateIndexBuffer();
+        }
+        LoadTexture(szTextureName);
 
-    if (CreateIndexData())
-    {
-        CreateIndexBuffer();        
-    }
-
-    if (SUCCEEDED(CreateVertexShader(filename, vsEntry)))
-    {
-        if (SUCCEEDED(CreatePixelShader(filename, psEntry)))
+        if (SUCCEEDED(LoadShader(vsfilename, psfilename, vsEntry, psEntry)))
         {
             if (SUCCEEDED(CreateVertexLayout()))
             {
+                CreateConstantBuffer();
                 return true;
             }
         }
@@ -239,10 +240,9 @@ bool JModel::PreRender(ID3D11DeviceContext* pContext)
 {
     if (m_pVertexList.size() <= 0) return true;
 
-    pContext->UpdateSubresource(
-        m_pConstantBuffer, 0, NULL, &m_cbData, 0, 0);
-    pContext->VSSetConstantBuffers(
-        0, 1, &m_pConstantBuffer);
+    pContext->UpdateSubresource(m_pConstantBuffer, 0, NULL, &m_cbData, 0, 0);
+    pContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
+    pContext->PSSetShaderResources(0, 1, &m_Tex.m_pTextureSRV);
     pContext->VSSetShader(m_pVS, NULL, 0);
     pContext->PSSetShader(m_pPS, NULL, 0);
     pContext->IASetInputLayout(m_pVertexLayout);
@@ -279,7 +279,7 @@ bool JModel::PostRender(ID3D11DeviceContext* pContext, UINT iNumIndex)
 
 bool JModel::Release()
 {
-
+    m_Tex.Release();
     SAFE_RELEASE(m_pVertexBuffer);
     SAFE_RELEASE(m_pVertexLayout);
     SAFE_RELEASE(m_pIndexBuffer);

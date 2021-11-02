@@ -8,7 +8,7 @@ LRESULT JCore::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 bool JCore::GameInit()
 {
 	JDevice::SetDevice();
-	SetDeviceState();
+	JDxState::Init();
 	m_Timer.Init();
 	g_Input.Init();
 	m_Write.Init();
@@ -43,8 +43,21 @@ bool JCore::GameFrame()
 	{
 		m_bDebugText = !m_bDebugText;
 	}
+	
+	if (!JDxState::g_pCurrentRS)
+	{
+		JDxState::g_pCurrentRS = JDxState::g_pRSSolid;
+	}
+	else if (g_Input.GetKey(VK_F2) >= KEY_PUSH)
+	{
+		ApplyRS(m_pImmediateContext, JDxState::g_pRSWireFrame);
+	}
+	else if (g_Input.GetKey(VK_F3) >= KEY_PUSH)
+	{
+		ApplyRS(m_pImmediateContext, JDxState::g_pRSSolid);
+	}
+	
 	Frame();
-
 	g_Input.m_ptBeforePos = g_Input.m_ptPos;
 	return true;
 }
@@ -83,14 +96,7 @@ bool JCore::GameRender()
 			D2D1::ColorF(0, 0, 1, 1));
 	}
 	//
-	if (g_Input.GetKey(VK_F2) >= KEY_PUSH)
-	{
-		m_pImmediateContext->RSSetState(m_pRSWireFrame);
-	}
-	else if (g_Input.GetKey(VK_F3) >= KEY_PUSH)
-	{
-		m_pImmediateContext->RSSetState(m_pRSSolid);
-	}
+
 
 	
 
@@ -117,11 +123,7 @@ bool JCore::GameRender()
 bool JCore::GameRelease()
 {
 	Release();
-	if (m_pRSSolid)m_pRSSolid->Release();
-	if (m_pRSWireFrame)m_pRSWireFrame->Release();
-	m_pRSSolid = nullptr;
-	m_pRSWireFrame = nullptr;
-
+	JDxState::Release();
 	m_Timer.Release();
 	g_Input.Release();
 	m_Write.Release();
@@ -131,29 +133,6 @@ bool JCore::GameRelease()
 	CleanupDevice();
 	return true;
 }
-
-bool JCore::SetDeviceState()
-{
-	HRESULT hr = S_OK;
-	D3D11_RASTERIZER_DESC rd;
-	
-	ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
-	rd.FillMode = D3D11_FILL_WIREFRAME;
-	rd.CullMode = D3D11_CULL_BACK;
-	hr = g_pd3dDevice->CreateRasterizerState(&rd, &m_pRSWireFrame);
-	if (FAILED(hr)) return false;
-
-
-	ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
-	rd.FillMode = D3D11_FILL_SOLID;
-	rd.CullMode = D3D11_CULL_BACK;
-	hr = g_pd3dDevice->CreateRasterizerState(&rd, &m_pRSSolid);
-	if (FAILED(hr)) return false;
-
-	return true;
-}
-
-
 
 bool JCore::Init()
 {
@@ -167,8 +146,18 @@ bool JCore::Frame()
 bool JCore::PreRender()
 {
 	float ClearColor[4] = { 0.125f, 0.5f, 0.5f, 1.0f };
-	m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, ClearColor);
+	m_pImmediateContext->ClearRenderTargetView(
+		m_DefaultRT.m_pRenderTargetView, ClearColor);
+	m_pImmediateContext->ClearDepthStencilView(
+		m_DefaultDS.m_pDepthStencilView,
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_pImmediateContext->OMSetRenderTargets(1,
+		&m_DefaultRT.m_pRenderTargetView, m_DefaultDS.m_pDepthStencilView);
+
+	ApplyDSS(m_pImmediateContext, JDxState::g_pLessEqualDSS);
+	ApplySS(m_pImmediateContext, JDxState::g_pWrapSS, 0);
+	ApplyRS(m_pImmediateContext, JDxState::g_pCurrentRS);
 	return true;
 }
 
@@ -186,12 +175,6 @@ bool JCore::PostRender()
 
 bool JCore::Release()
 {
-	
-	if(m_pRSWireFrame) m_pRSWireFrame->Release();
-	if (m_pRSSolid) m_pRSSolid->Release();
-	m_pRSWireFrame = nullptr;
-	m_pRSSolid = nullptr;
-
 	m_Camera.Release();
 	
 	return true;

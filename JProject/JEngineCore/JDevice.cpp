@@ -1,6 +1,16 @@
 #include "JDevice.h"
 ID3D11Device* g_pd3dDevice = nullptr;
 
+HRESULT JDevice::SetDepthStencilView()
+{
+	HRESULT hr = S_OK;
+	DXGI_SWAP_CHAIN_DESC Desc;
+	m_pSwapChain->GetDesc(&Desc);
+	hr = m_DefaultDS.CreateDepthStencilView(Desc.BufferDesc.Width,
+		Desc.BufferDesc.Height);
+	return hr;
+}
+
 bool JDevice::SetDevice()
 {
 	
@@ -12,6 +22,7 @@ bool JDevice::SetDevice()
 	{
 		return false;
 	}
+	g_pd3dDevice = m_pd3dDevice;
 	if (FAILED(CreateSwapChain(g_hWnd, g_rtClient.right, g_rtClient.bottom)))
 	{
 		return false;
@@ -20,11 +31,15 @@ bool JDevice::SetDevice()
 	{
 		return false;
 	}
+	if (FAILED(SetDepthStencilView()))
+	{
+		return false;
+	}
 	if (FAILED(SetViewPort()))
 	{
 		return false;
 	}
-	g_pd3dDevice = m_pd3dDevice;
+	
 	return true;
 }
 
@@ -99,7 +114,8 @@ HRESULT JDevice::SetRenderTargetView()
 		pBackBuffer->Release();
 		return hr;
 	}
-	hr = m_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &m_pRenderTargetView);
+	m_DefaultRT.SetRenderTargetView(pBackBuffer);
+	/*hr = m_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &m_pRenderTargetView);
 	if (FAILED(hr))
 	{
 		pBackBuffer->Release();
@@ -109,10 +125,11 @@ HRESULT JDevice::SetRenderTargetView()
 		
 	m_pImmediateContext->OMSetRenderTargets(1,
 		&m_pRenderTargetView,
-		NULL);
+		NULL);*/
 
 	return hr;
 }
+
 HRESULT JDevice::SetViewPort()
 {
 	HRESULT hr = S_OK;
@@ -132,6 +149,8 @@ HRESULT JDevice::SetViewPort()
 }
 bool JDevice::CleanupDevice()
 {
+	m_DefaultDS.Release();
+	m_DefaultRT.Release();
 	if (m_pImmediateContext) { m_pImmediateContext->ClearState(); }
 	if (m_pd3dDevice) { m_pd3dDevice->Release(); }
 	if (m_pSwapChain) { m_pSwapChain->Release(); }

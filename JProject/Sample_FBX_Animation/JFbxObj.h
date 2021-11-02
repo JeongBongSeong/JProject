@@ -1,79 +1,5 @@
 #pragma once
-#include "JModel.h"
-#include <fbxsdk.h>
-#pragma comment	(lib, "libfbxsdk.lib")
-#pragma comment	(lib, "libxml2-md.lib")
-#pragma comment	(lib, "zlib-md.lib")
-
-const enum OBJECTCLASSTYPE {
-	CLASS_GEOM = 0,
-	CLASS_BONE,
-	CLASS_DUMMY,
-	CLASS_BIPED,
-};
-
-struct JMtrl
-{
-	FbxNode* m_pFbxNode;
-	FbxSurfaceMaterial* m_pFbxSurfaceMtrl;
-	JTexture	m_Texture;
-	std::vector<JMtrl*> m_pSubMtrl;
-
-	JMtrl() {}
-	JMtrl(FbxNode* pFbxNode, FbxSurfaceMaterial* pFbxMtrl) 
-	{
-		m_pFbxNode = pFbxNode;
-		m_pFbxSurfaceMtrl = pFbxMtrl;
-	}
-
-	void Release()
-	{
-		m_Texture.Release();
-		for (auto& data : m_pSubMtrl)
-		{
-			data->Release();
-			delete data;
-		}
-	}
-};
-
-struct JLayer
-{
-	FbxLayerElementUV* pUV;
-	FbxLayerElementVertexColor* pColor;
-	FbxLayerElementNormal* pNormal;
-	FbxLayerElementMaterial* pMaterial;
-};
-
-struct JMesh : public JModel
-{
-	OBJECTCLASSTYPE		m_ClassType;
-	std::wstring		m_szName;
-	std::wstring		m_szParentName;
-	int					m_iNumLayer;
-	std::vector<JLayer> m_LayerList;
-	int					m_iMtrlRef;
-	TMatrix				m_matWorld;
-	JMesh*				m_pParent;
-	std::vector<TMatrix> m_AnimationTrack;
-	std::vector<JMesh*>	m_pSubMesh;
-	
-
-	virtual bool Release()
-	{
-		JModel::Release();
-		for (auto data : m_pSubMesh)
-		{
-			data->Release();
-			SAFE_DEL(data);
-		}
-		return true;
-	}
-	JMesh()
-	{
-		m_ClassType = CLASS_GEOM;
-	}
-};
+#include"JMesh.h"
 
 class JFbxObj
 {
@@ -81,6 +7,8 @@ class JFbxObj
 	FbxImporter* m_pFbxImporter;
 	FbxScene* m_pFbxScene;
 public:
+	TMatrix		m_matWorld;
+	JAnimMatrix m_matAnimMatrix;
 	bool	m_bAnimPlay = false;
 	float   m_fElpaseTime = 0.0f;
 	int		m_iAnimIndex = 0;
@@ -95,7 +23,8 @@ public:
 	/// 가상함수 리스트
 	/// </summary>
 public:
-	bool	LoadObject(std::string filename);
+	JMesh*	GetFindInedx(FbxNode* pNode);
+	bool	LoadObject(std::string filename, std::string shaderfilename);
 	bool	Frame();
 	bool    Release();
 
@@ -103,6 +32,7 @@ public:
 	TMatrix     ConvertMatrix(FbxMatrix& m);
 	TMatrix     ConvertAMatrix(FbxAMatrix& m);
 
+	void SetPixelShader(ID3D11PixelShader* ps);
 public:
 	void	SetMatrix(TMatrix* pMatWorld, TMatrix* pMatView, TMatrix* pMatProj);
 	bool    Render(ID3D11DeviceContext* pContext);
@@ -117,9 +47,11 @@ public:
 	void	ParseMesh(FbxNode* pNode, JMesh* pMesh);
 	TMatrix		ParseTransform(FbxNode* pNode, TMatrix& matParent);
 public:
-	void	ParseAnimationNode(FbxNode* pNode, JMesh* pMesh);
+	void	ParseAnimationNode();
 	void	ParseAnimation();
 	void	ParseAnimStack(FbxString* szData);
+	bool	ParseMeshSkinning(FbxMesh* pFbxMesh, JMesh* pMesh, JSkinData* pSkindata);
+
 public:
 	FbxVector2 ReadTextureCoord(FbxMesh* pFbxMesh, DWORD dwVertexTextureCount, FbxLayerElementUV* pUVSet, int vertexIndex, int uvIndex);
 	FbxVector4  ReadNormal(const FbxMesh* mesh, DWORD dwVertexNormalCount, FbxLayerElementNormal* VertexNormalSets,int controlPointIndex, int dwVertexIndex);

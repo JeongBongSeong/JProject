@@ -150,12 +150,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="JFbxObj.h" />
+    <ClInclude Include="JMesh.h" />
     <ClInclude Include="Sample.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JFbxAnimation.cpp" />
     <ClCompile Include="JFbxMeshData.cpp" />
     <ClCompile Include="JFbxObj.cpp" />
+    <ClCompile Include="JMesh.cpp" />
     <ClCompile Include="Sample.cpp" />
   </ItemGroup>
   <ItemGroup>

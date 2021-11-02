@@ -1,11 +1,11 @@
 #include "JMap.h"
-bool    JMap::Load(JMapInfo& info)
+bool    JMap::Load(JMapInfo& info, std::wstring vsfilename, std::wstring psfilename, std::string vsEntry, std::string psEntry)
 {
     m_info = info;
     m_info.m_iNumColCell = m_info.m_iNumCol - 1;
     m_info.m_iNumRowCell = m_info.m_iNumRow - 1;
     m_info.m_iNumVertex = m_info.m_iNumColCell * m_info.m_iNumRowCell * 6;
-    return true;
+    return Create(vsfilename, psfilename, vsEntry, psEntry, info.szDefaultTexture);
 }
 bool	JMap::CreateVertexData()
 {
@@ -18,7 +18,7 @@ bool	JMap::CreateVertexData()
         {
             int iIndex = iRow * m_info.m_iNumRow + iCol;
             m_pVertexList[iIndex].pos.x = m_info.m_fCellDistance * iCol;
-            m_pVertexList[iIndex].pos.y = 0.0f;
+            m_pVertexList[iIndex].pos.y = randstep(0.0f, 5.0f);
             m_pVertexList[iIndex].pos.z = -m_info.m_fCellDistance * iRow;
 
             m_pVertexList[iIndex].color =

@@ -32,6 +32,7 @@ VS_OUT VS(VS_IN vIn)
 	float4 vWorld = mul(vLocal, g_matWorld);
 	float4 vView = mul(vWorld, g_matView);
 	float4 vProj = mul(vView, g_matProj);
+
 	output.p = vProj;
 	output.n = vIn.n;
 	output.c = vIn.c;

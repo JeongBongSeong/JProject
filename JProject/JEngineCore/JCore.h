@@ -8,6 +8,7 @@
 
 #include "JShape.h"
 #include "JCamera.h"
+#include "JDxState.h"
 
 class JCore : public JWindow
 {
@@ -16,13 +17,8 @@ public:
 	//JInput m_Input;
 	JWrite m_Write;
 	JDebugCamera		m_Camera;
-
 	//JBoxShape			m_BoxObj[2];
-
 	bool m_bDebugText = false;
-public:
-	ID3D11RasterizerState* m_pRSSolid;
-	ID3D11RasterizerState* m_pRSWireFrame;
 
 public:
 	virtual bool Init();
@@ -32,7 +28,6 @@ public:
 	virtual bool PostRender();
 	virtual bool Release();
 public:
-	bool SetDeviceState();
 	bool CameraFrame();
 	LRESULT MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)override;
 public:
